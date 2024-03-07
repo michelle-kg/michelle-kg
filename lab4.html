@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Michelle's Clothing Shop</title>
+</head>
+
+<body>
+    <script>
+        // 1. Welcome Alert
+        window.alert("Welcome to Michelle's Clothing Shop");
+
+        // 2. Via Prompt: name, item requested, number of items
+        var name, requested, inventory;
+        name = prompt("Please enter your name:", "Michelle");
+        requested = prompt("What are you buying? (T-Shirt or Sweater)", "T-Shirt");
+        inventory = parseInt(prompt("How many items are you buying? (1-99)", "1"));
+
+        // Making sure input is within 1-99 range
+        if (inventory < 1 || inventory > 99 || isNaN(inventory)) {
+            alert("Please restart and enter a number between 1 and 99."); } 
+
+        else {
+            // 3. Time Greeting
+            var now = new Date();
+            var hour = now.getHours();
+            var greeting;
+            if (hour < 12) {
+                greeting = "Good Morning";
+            } else if (hour < 18) {
+                greeting = "Good Afternoon";
+            } else {
+                greeting = "Good Evening";
+            }
+            
+        // 4. Greeting + Order details
+            document.write("<h1>" + greeting + " " + name + ",\r\n Thank you for Ordering!</h1>");  // extra credit use \r: '\r' with '\n' creates a line break
+            document.write("<p>You ordered " + inventory + " " + requested + "(s).</p>");
+
+        // 5. Expected arrival date (exactly 7 days from now)
+            var arrivalDate = new Date(now.getTime() + 604800000); //7 days worth of milliseconds, or 7*24*60*60*1000
+            document.write("<p>Your order is expected to arrive on: " + arrivalDate.toDateString() + "</p>");
+        }
+    </script>
+
+<hr>
+<a href="https://brianobruno.github.io/">[CSC 225 Syllabus]</a>
+<a href="https://michelle-kg.github.io/index.html">[Index]</a>
+<a href="https://michelle-kg.github.io/lab3.html">[Lab 3]</a>
+<a href="https://michelle-kg.github.io/lab4.html">[Lab 4]</a>
+<p>Updated 3/6/2024 by Michelle Kuang</p>
+
+</body>
+
+</html>
