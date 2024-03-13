@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+
+    <title>T-shirt Registration Page</title>
+</head>
+
+<body>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <center>
+                <h1 class="display-4">T-shirt Registration Form</h1>
+                <p class="lead">Sign Up for a T-shirt Below!</p>
+            </center>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link active" aria-current="page" href="index.html">Index</a>
+                    <a class="nav-link" aria-current="page" href="lab3.html">Lab 3</a>
+                    <a class="nav-link active" aria-current="page" href="lab4.html">Lab 4</a>
+                    <a class="nav-link" aria-current="page" href="lab5.html">Lab 5</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5"> 
+                <img src="https://static.goldengoose.com/image/upload/w_auto,c_scale,f_auto,q_auto/v1666349874/Style/ECOMM/GMP01220.P000865-11443-9" height="500" width="400" class="rounded">
+            </div>
+            
+            <div class="col-md-6"> 
+                <h1>Sign Up Form</h1>
+                <p>Enter your first name, last name, email, password, and DOB for your limited-edition T-shirt</p>
+                <form id="registrationForm">
+                    <label for="firstName">First Name:</label><br>
+                    <input type="text" id="firstName" name="firstName" required><br>
+                
+                    <label for="lastName">Last Name:</label><br>
+                    <input type="text" id="lastName" name="lastName" required><br>
+                
+                    <label for="email">Email Address:</label><br>
+                    <input type="email" id="email" name="email" required><br>
+                
+                    <label for="password">Password:</label><br>
+                    <input type="password" id="password" name="password" required><br>
+                
+                    <label for="dob">Date of Birth:</label><br>
+                    <input type="date" id="dob" name="dob" required><br><br>
+                
+                    <button type="submit">Submit</button>
+                </form>
+            
+                <div id="registrationInfo"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JS form variables/inputs
+        document.getElementById("registrationForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // prevents form submission
+            
+            // Registration form inputs
+            var firstName = document.getElementById("firstName").value;
+            var lastName = document.getElementById("lastName").value;
+            var email = document.getElementById("email").value;
+            var password = document.getElementById("password").value;
+            var dob = document.getElementById("dob").value;
+
+            // Password must have either !/?
+            if (!validatePassword(password)) {
+                document.getElementById("registrationInfo").innerHTML = 
+                "<p style='color: red;' class='error'>Password must contain a special character (! or ?)</p>";
+
+                return;
+            }
+
+            // Registration form objects + hide password with asterik*
+            var user = {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: password.replace(/./g, '*'), // security: global replaces all characters with *
+                dob: dob
+            };
+
+            // Registration successful message + user information
+            document.getElementById("registrationInfo").innerHTML = 
+            "<br><h6><b style='color: green;'>Registration Success!</b></h6>" +
+            "<h6>You've successfully registered for a limited-edition T-shirt! A receipt of your registration will be emailed to you.</h6>" +
+            "<b>User Information</b>" +
+            "<p>First Name: " + user.firstName + "</p>" +
+            "<p>Last Name: " + user.lastName + "</p>" +
+            "<p>Email: " + user.email + "</p>" +
+            "<p>Password: " + user.password + "</p>"+
+            "<p>Date of Birth: " + user.dob + "</p>";
+        });
+
+        // Password test for special character !/?
+        function validatePassword(password) {
+            return /[!?]/.test(password);
+        }
+    </script>
+
+    <hr>
+    <p>Updated 3/13/2024 by Michelle Kuang</p>
+</body>
+</html>
