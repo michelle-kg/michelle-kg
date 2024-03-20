@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Cat Facts</title>
+
+    <style>
+        table, th, td {
+        border:1px solid black;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h1>5 Facts about Cats</h1>
+
+    <!-- 1. Button that triggers REST API -->
+    <button onclick="getFacts()">Load Table</button>
+    <!-- Table, row, headers -->
+    <table id="tableHead"> 
+        <thead>
+            <tr>
+                <th>factId</th>
+                <th>fact</th>
+            </tr>
+        </thead>
+
+        <tbody id="table">
+            
+        </tbody>
+    </table>
+    <br>
+
+  <img id="catJPG" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Cat_August_2010-4.jpg/1200px-Cat_August_2010-4.jpg" alt="Picture of Cat">
+  
+  <script>
+    // 2. Cosume REST API (get); fetch API from JSON
+    function getFacts() {
+        fetch('https://brianobruno.github.io/cats.json')
+        .then(response => response.json())
+        .then(data => { 
+            // 3. Sort facts by factId number; use variable names from JSON
+            const sortFacts = data.facts.sort((a, b) => a.factId - b.factId); // 
+
+            // 4. Update picture
+            document.getElementById('catJPG').src = data.catPhoto;
+
+            // Populate table with facts
+            const table = document.getElementById('table');
+            table.innerHTML = '';
+            sortFacts.forEach(fact => {
+            const row = `<tr><td>${fact.factId}</td><td>${fact.text}</td></tr>`;
+            table.innerHTML += row;
+            });
+        })
+    }
+  </script>
+  
+</body>
+</html>
