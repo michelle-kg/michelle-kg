@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+
+    <title>Random Villager Quote Generator</title>
+
+    <style>
+        body {
+            background-image: url('https://i.imgur.com/vZNR3c2.png');
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="home.html">Home</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="villagers.html">Villagers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="photos.html">Photos/Posters</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="quotes.html">Quotes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="quote-randomizer.html">Quote Randomizer</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="jumbotron text-center bg-white shadow-sm rounded">
+        <div class="container">
+            <h1 class="display-5">Random Villager Quote Generator</h1>
+            <p class="lead">Pull a villager quote at random</p>
+        </div>
+    </div>
+
+        <!-- Button: Quote Randomizer-->
+        <div class="text-center my-4">
+            <button id="button" class="btn btn-primary btn-success">Randomize!</button>
+        </div>
+    
+    <!-- Container: Villager Quote & Name-->
+    <div class="text-center mt-4" id="villager-container" ></div>
+    </div>
+
+    <!-- REST API Data Fetch & JS -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const apiURL = "https://api.nookipedia.com/villagers";
+            const apiKEY = "b9583896-c8c6-4e34-af69-b13b8d192237";
+
+            let villagerData = [];
+
+            // Fetch data from the REST API
+            fetch(apiURL + "?api_key=" + apiKEY)
+                .then(response => response.json())
+                .then(data => {
+                    villagerData = data;
+                    console.log("Villager data was loaded successfully!");
+                })
+                .catch(error => {
+                    console.error("There was an error fetching data. Error:", error);
+                });
+
+            // Function: display Villager (image+quote+title)
+            function displayVillager() {
+                if (villagerData.length === 0) {
+                    console.error("There is no villager data available.");
+                    return;
+                }
+
+                let villager;
+                
+                // RANDOMIZER SCRIPT: JS random integer = Math.random() + Math.floor
+                    // Loop (*side note: some villagers have no quote data, loop randomizer until quote data is available)
+                do {
+                    const randomNum = Math.floor(Math.random() * villagerData.length);
+                    villager = villagerData[randomNum];
+                } while (!villager.quote || villager.quote.trim() === "");
+
+                // BS Cards
+                const card = document.createElement("div");
+                card.classList.add("card", "text-center", "mb-3", "col-md-6", "mx-auto"); 
+
+                    // Card body (for villager details)
+                    const cardBody = document.createElement("div");
+                    cardBody.classList.add("card-body");
+                    card.appendChild(cardBody);
+
+                    // Villager details (text: Image+Quote+Name)
+                    const villagerImage = document.createElement("img");
+                    villagerImage.src = villager.image_url; 
+                    cardBody.appendChild(villagerImage);
+
+                    const villagerQuote = document.createElement("h4");
+                    villagerQuote.textContent = `❝ ${villager.quote} ❞`;
+                    cardBody.appendChild(villagerQuote);
+
+                    const villagerName = document.createElement("h5");
+                    villagerName.textContent = `— ${villager.name}`;
+                    cardBody.appendChild(villagerName);
+
+                        // styling
+                        villagerImage.classList.add("card-img-top", "mx-auto"); 
+                        villagerImage.style.width = "250px";
+                        villagerImage.style.height = "270px"; 
+                        villagerImage.style.objectFit = "contain";
+                        villagerImage.style.padding = "20px"; 
+
+                    // display+append villager card in villager container
+                    const villagerContainer = document.getElementById("villager-container");
+                    if (villagerContainer) {
+                        villagerContainer.innerHTML = ""; //clear
+                        villagerContainer.appendChild(card);
+                    }
+                }
+
+            // Event Listener: Button+Randomize
+            const button = document.getElementById("button");
+            if (button) {
+                button.addEventListener("click", displayVillager);
+            }
+        });
+
+    </script>
+</body>
+
+</html>
