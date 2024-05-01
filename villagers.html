@@ -1,0 +1,304 @@
+ <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+
+    <title>AC Villagers List</title>
+
+    <style>
+        body {
+            background-image: url('https://i.imgur.com/vZNR3c2.png');
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="home.html">Home</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="villagers.html">Villagers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="photos.html">Photos/Posters</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="quotes.html">Quotes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="quote-randomizer.html">Quote Randomizer</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="jumbotron text-center bg-white shadow-sm rounded">
+        <div class="container mb-4">
+            <h1 class="display-5">Animal Crossing Villagers</h1>
+            <p class="lead">Villager information from the entire Animal Crossing series</p>
+        </div>
+    </div>
+
+    <!-- Search & Filters -->
+    <div class="container mb-4">
+        <input type="text" id="search-input" placeholder="Search for a villager" class="form-control mb-1">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <select id="appearances-filter" class="form-control">
+                    <option value="all">All Game Series</option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <select id="species-filter" class="form-control">
+                    <option value="all">All Species</option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <select id="personality-filter" class="form-control">
+                    <option value="all">All Personalities</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container: Villager List -->
+    <div class="container" id="villager-container">
+        <div class="row"></div>
+    </div>
+
+    <!-- REST API Data Fetch & JS -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const apiURL = "https://api.nookipedia.com/villagers";
+            const apiKEY = "b9583896-c8c6-4e34-af69-b13b8d192237";
+            const villagerContainer = document.getElementById("villager-container");
+
+            const appearancesFilter = document.getElementById("appearances-filter");
+            const speciesFilter = document.getElementById("species-filter");
+            const personalityFilter = document.getElementById("personality-filter");
+
+            const searchInput = document.getElementById("search-input");
+
+            let villagerData = [];
+
+            // *** API Data Fetch
+            fetch(apiURL + "?api_key=" + apiKEY)
+                .then(response => response.json())
+                .then(data => {
+                    villagerData = data;
+
+                    // Populate filter dropdowns with different values
+                    populateAppearancesFilter(villagerData);
+                    populateSpeciesFilter(villagerData);
+                    populatePersonalityFilter(villagerData);
+
+                    displayVillagers(villagerData);
+                })
+                .catch(error => {
+                    console.error("There was an error fetching data. Error:", error);
+                });
+
+        // [Filter] START   
+            // Populate (game) appearances filter
+            function populateAppearancesFilter(data) {
+                const appearancesSet = new Set();
+                data.forEach(villager => {
+                    villager.appearances.forEach(game => appearancesSet.add(game));
+                });
+             
+                // convert set to array + sort alphabetical + add each game as option
+                Array.from(appearancesSet).sort().forEach(game => {
+                    const option = document.createElement("option");
+                    option.value = game;
+                    option.textContent = game;
+                    appearancesFilter.appendChild(option);
+                });
+            }
+
+            // Populate species filter
+            function populateSpeciesFilter(data) {
+                const speciesSet = new Set();
+                data.forEach(villager => {
+                    speciesSet.add(villager.species);
+                });
+         
+                // convert set to array + sort alphabetical + add each species as option
+                Array.from(speciesSet).sort().forEach(species => {
+                    const option = document.createElement("option");
+                    option.value = species;
+                    option.textContent = species;
+                    speciesFilter.appendChild(option);
+                });
+            }
+
+            // Populate personality filter
+            function populatePersonalityFilter(data) {
+                const personalities = new Set();
+                data.forEach(villager => {
+                    personalities.add(villager.personality);
+                });
+
+                // convert set to array + sort alphabetical + add each personalities as option
+                Array.from(personalities).sort().forEach(personality => {
+                    const option = document.createElement("option");
+                    option.value = personality;
+                    option.textContent = personality;
+                    personalityFilter.appendChild(option);
+                });
+            }
+
+            // * Filter changes + search input changes
+            appearancesFilter.addEventListener("change", filterVillagers);
+            speciesFilter.addEventListener("change", filterVillagers);
+            personalityFilter.addEventListener("change", filterVillagers);
+            searchInput.addEventListener("input", filterVillagers);
+
+            // Filter Function + display FILTERED villagers
+            function filterVillagers() {
+                const searchFilter = searchInput.value.toLowerCase();
+                const filteredGame = appearancesFilter.value;
+                const filteredSpecies = speciesFilter.value;
+                const filteredPersonality = personalityFilter.value;
+
+                // filter villager (based on species, game, perso   nality, quote data, search)
+                const filteredVillager = villagerData.filter(villager => {
+
+                    const gameMatch = filteredGame === "all" || villager.appearances.includes(filteredGame);
+                    const speciesMatch = filteredSpecies === "all" || villager.species === filteredSpecies;
+                    const personalityMatch = filteredPersonality === "all" || villager.personality === filteredPersonality;
+                    const searchMatch = villager.name.toLowerCase().includes(searchFilter);
+
+                    // return villager that match all filters
+                    return gameMatch && speciesMatch && personalityMatch && searchMatch;
+                });
+
+                displayVillagers(filteredVillager);
+            }
+        // [Filter] END
+
+            // Display list of villagers
+            function displayVillagers(data) {
+                villagerContainer.innerHTML = ""; //clear
+                const row = document.createElement("div");
+                row.classList.add("row");
+
+                data.forEach(villager => {
+                    const villagers = document.createElement("div");
+                    villagers.classList.add("col-md-4", "mb-2");
+
+                    const card = document.createElement("div");
+                    card.classList.add("card", "h-100");
+
+
+                    // Villager Image Element
+                    const villagerImage = document.createElement("img");
+                    villagerImage.src = villager.image_url;
+
+                        // styling
+                        villagerImage.classList.add("card-img-top", "mx-auto"); 
+                        villagerImage.style.width = "200px";
+                        villagerImage.style.height = "220px"; 
+                        villagerImage.style.objectFit = "contain";
+                        villagerImage.style.padding = "20px"; 
+
+                    card.appendChild(villagerImage);
+
+
+                    // Card body (for villager details)
+                    const cardBody = document.createElement("div");
+                    cardBody.classList.add("card-body");
+
+                    // Villager Name Element
+                    const villagerName = document.createElement("h5");
+                    villagerName.classList.add("card-title");
+                    villagerName.textContent = villager.name;
+                    cardBody.appendChild(villagerName);
+
+                        // Villager details - Elements (text: Species+Personality+Birthday+Catchphrase)
+                            const villagerSpecies = document.createElement("p");
+                            villagerSpecies.textContent = `• Species: ${villager.species}`;
+                            cardBody.appendChild(villagerSpecies);
+
+                            const villagerPersonality = document.createElement("p");
+                            villagerPersonality.textContent = `• Personality: ${villager.personality}`;
+                            cardBody.appendChild(villagerPersonality);
+
+                            // < if Villager birthday-month and birthday-day have values, display birthday; if not, display N/A
+                            let birthday = `• Birthday: `;
+                                if (villager.birthday_month && villager.birthday_day) {
+                                    birthday += `${villager.birthday_month} ${villager.birthday_day}`;
+                                } else {
+                                    birthday += "N/A";
+                            }
+
+                            const villagerBirthday = document.createElement("p");
+                            villagerBirthday.textContent = birthday;
+                            cardBody.appendChild(villagerBirthday);
+                            // >
+
+                            const villagerQuote = document.createElement("p");
+                            villagerQuote.textContent = `• Catchphrase: "${villager.phrase}"`;
+                            cardBody.appendChild(villagerQuote);
+
+                                // append
+                                card.appendChild(cardBody);
+                                villagers.appendChild(card);
+                                row.appendChild(villagers);
+                                });
+                                villagerContainer.appendChild(row);
+                                }
+                                });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
