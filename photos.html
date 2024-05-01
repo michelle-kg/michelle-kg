@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+
+    <title>NH Photos/Posters List</title>
+
+    <style>
+        body {
+            background-image: url('https://i.imgur.com/vZNR3c2.png');
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    
+</head>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="home.html">Home</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="villagers.html">Villagers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="photos.html">Photos/Posters</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="quotes.html">Quotes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="quote-randomizer.html">Quote Randomizer</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="jumbotron text-center bg-white shadow-sm rounded">
+        <div class="container mb-4">
+            <h1 class="display-5">New Horizons Photos and Posters</h1>
+            <p class="lead">Villager photos and posters from the Animal Crossing New Horizons series</p>
+        </div>
+    </div>
+
+
+    <!-- Search Filter -->
+    <div class="container my-3">
+        <input type="text" id="search-input" placeholder="Search for a villager" class="form-control mb-1">
+    </div>
+
+    <!-- Container: Villager Photo/Poster List -->
+    <div class="container" id="villager-container">
+        <div class="row"></div>
+    </div>
+
+    <!-- REST API Data Fetch & JS -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const apiURL = "https://api.nookipedia.com/nh/photos";
+            const apiKEY = "b9583896-c8c6-4e34-af69-b13b8d192237";
+            const villagerContainer = document.getElementById("villager-container");
+            const searchInput = document.getElementById("search-input");
+
+            let villagerData = [];
+
+            // API Data Fetch
+            fetch(apiURL + "?api_key=" + apiKEY)
+                .then(response => response.json())
+                .then(data => {
+                    villagerData = data;
+                    displayVillagers(villagerData);
+                })
+                .catch(error => {
+                    console.error("There was an error fetching data. Error:", error);
+                });
+
+            // Villager Name + Photo/Poster (image) List
+            function displayVillagers(data) {
+                const row = villagerContainer.querySelector(".row");
+                row.innerHTML = ""; //clear
+
+                data.forEach(villager => {
+                    const villagerElement = document.createElement("div");
+                    villagerElement.classList.add("col-md-3", "mb-2");
+
+                    // fetch image-url from 'variations' -> [0]
+                    const imageVariation = villager.variations && villager.variations[0];
+                    const imageURL = imageVariation ? imageVariation.image_url : '';
+
+                    // Villager Photo/Poster (image) Element
+                    const villagerImage = document.createElement("img");
+                    villagerImage.src = imageURL;
+                    villagerImage.classList.add("card-img-top");
+
+                    // Villager Name Element
+                    const villagerName = document.createElement("p");
+                    villagerName.classList.add("text-center");
+                    villagerName.textContent = villager.name;
+
+                    // BS Cards
+                    const card = document.createElement("div");
+                    card.classList.add("card", "h-100");
+
+                    const cardBody = document.createElement("div");
+                    cardBody.classList.add("card-body");
+                    card.appendChild(cardBody);
+
+                        // append to Elements^
+                        cardBody.appendChild(villagerImage);
+                        cardBody.appendChild(villagerName);
+                        villagerElement.appendChild(card);
+                        row.appendChild(villagerElement);
+                });
+            }
+
+            // Event Listener: Search Bar input+changes/filter
+            searchInput.addEventListener("input", () => {
+                const searchTerm = searchInput.value.toLowerCase();
+
+                const filteredVillager = villagerData.filter(villager =>
+                    villager.name.toLowerCase().includes(searchTerm)
+                );
+                displayVillagers(filteredVillager);
+            });
+        });
+    
+    </script>
+</body>
+
+</html>
